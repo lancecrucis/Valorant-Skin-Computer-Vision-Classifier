@@ -1,7 +1,7 @@
 from torch import nn
 from torchvision import models
 
-NUM_CLASSES = 2
+NUM_CLASSES = 3
 
 
 def get_model(num_classes: int = NUM_CLASSES, pretrained: bool = True) -> nn.Module:
