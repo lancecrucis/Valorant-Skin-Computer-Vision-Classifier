@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VALORANT | Skin Classifier</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg-primary: #1a242e;
+      --bg-secondary: #0f1923;
+      --bg-card: #1c2b35;
+      --accent-red: #ff4655;
+      --accent-red-hover: #ff6b77;
+      --text-primary: #ece8e1;
+      --text-secondary: #a0aeb5;
+      --text-muted: #5c6f78;
+      --border-color: #2a3a45;
+      --transition-fast: 0.2s ease;
+      --transition-normal: 0.3s ease;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Oswald', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 80px;
+      background: linear-gradient(180deg, rgba(15,25,35,0.95) 0%, rgba(15,25,35,0) 100%);
+
+      transition: background var(--transition-normal);
+    }
+    .navbar.scrolled { background: rgba(15,25,35,0.98); box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+    .navbar-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .navbar-logo-icon { height: 48px; width: auto; filter: brightness(1.1); }
+    .navbar-logo-text { height: 18px; width: auto; filter: brightness(1.1); }
+    .navbar-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .navbar-links a {
+      font-size: 14px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--text-secondary); text-decoration: none; transition: color var(--transition-fast); position: relative;
+    }
+    .navbar-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
+      background: var(--accent-red); transition: width var(--transition-normal);
+    }
+    .navbar-links a:hover { color: var(--text-primary); }
+    .navbar-links a:hover::after { width: 100%; }
+    .navbar-links a.active { color: var(--accent-red); }
+    .navbar-links a.active::after { width: 100%; }
+    .navbar-cta {
+      padding: 10px 24px; background: var(--accent-red); color: var(--text-primary) !important; font-weight: 600;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+      transition: all var(--transition-fast) !important;
+    }
+    .navbar-cta:hover { background: var(--accent-red-hover); transform: translateY(-1px); }
+    .navbar-cta::after { display: none !important; }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative; width: 100%; height: 100vh; min-height: 700px;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .hero-video {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+      transform: scale(1.05); animation: heroZoom 20s ease-in-out infinite alternate;
+    }
+    @keyframes heroZoom { from { transform: scale(1.05); } to { transform: scale(1.12); } }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(15,25,35,0.6) 0%, rgba(15,25,35,0.3) 40%, rgba(15,25,35,0.5) 70%, rgba(15,25,35,1) 100%);
+    }
+    .hero-content { position: relative; z-index: 10; text-align: center; max-width: 900px; padding: 0 24px; }
+    .hero-eyebrow {
+      font-size: 14px; font-weight: 500; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--accent-red); margin-bottom: 24px; opacity: 0; animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+    .hero-title {
+      font-size: clamp(48px, 8vw, 96px); font-weight: 700; line-height: 1;
+      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px;
+      opacity: 0; animation: fadeUp 0.8s ease forwards 0.4s;
+    }
+    .hero-title span { color: var(--accent-red); display: block; }
+    .hero-subtitle {
+      font-size: 18px; font-weight: 400; color: var(--text-secondary);
+      max-width: 600px; margin: 0 auto 40px; line-height: 1.6;
+      opacity: 0; animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+    .hero-actions {
+      display: flex; gap: 16px; justify-content: center;
+      opacity: 0; animation: fadeUp 0.8s ease forwards 0.8s;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 16px 32px;
+      font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase; text-decoration: none;
+      border: none; cursor: pointer; transition: all var(--transition-fast);
+    }
+    .btn-primary {
+      background: var(--accent-red); color: var(--text-primary);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+    }
+    .btn-primary:hover { background: var(--accent-red-hover); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,70,85,0.3); }
+    .btn-secondary {
+      background: transparent; color: var(--text-primary); border: 2px solid var(--text-secondary);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+    }
+    .btn-secondary:hover { border-color: var(--text-primary); background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+
+    /* ===== SECTION COMMON ===== */
+    .section-eyebrow {
+      font-size: 13px; font-weight: 500; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--accent-red); margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(32px, 5vw, 56px); font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; line-height: 1.1;
+    }
+    .section-divider { width: 60px; height: 3px; background: var(--accent-red); margin: 24px auto 0; }
+
+    /* ===== CLASSIFIER SECTION ===== */
+    .classifier-section { padding: 100px 48px; max-width: 1400px; margin: 0 auto; }
+    .classifier-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .classifier-info { padding-right: 32px; }
+    .classifier-info .section-eyebrow { text-align: left; }
+    .classifier-info .section-title { text-align: left; font-size: clamp(28px, 4vw, 48px); }
+    .classifier-info .section-divider { margin: 24px 0 0; }
+    .classifier-desc {
+      font-size: 16px; color: var(--text-secondary); line-height: 1.8; margin-top: 32px; font-weight: 400;
+    }
+    .classifier-steps { margin-top: 40px; display: flex; flex-direction: column; gap: 24px; }
+    .step { display: flex; align-items: flex-start; gap: 20px; }
+    .step-number {
+      width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(255,70,85,0.1); border: 1px solid rgba(255,70,85,0.3);
+      font-size: 16px; font-weight: 700; color: var(--accent-red);
+    }
+    .step-text h4 { font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .step-text p { font-size: 14px; color: var(--text-muted); line-height: 1.5; font-weight: 400; }
+
+    /* ===== CLASSIFIER CARD ===== */
+    .classifier-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      padding: 48px; position: relative; overflow: hidden;
+    }
+    .classifier-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-red), transparent);
+    }
+    .classifier-card-bg {
+      position: absolute; inset: 0; z-index: 0; overflow: hidden; opacity: 0.08;
+    }
+    .classifier-card-bg img { width: 100%; height: 100%; object-fit: cover; }
+    .classifier-card > * { position: relative; z-index: 1; }
+
+    /* ===== DROPZONE ===== */
+    .dropzone {
+      border: 2px dashed var(--border-color); padding: 56px 32px; text-align: center;
+      cursor: pointer; transition: all var(--transition-normal); background: rgba(15,25,35,0.5);
+    }
+    .dropzone:hover, .dropzone.dragover { border-color: var(--accent-red); background: rgba(255,70,85,0.03); }
+    .dropzone.dragover { transform: scale(1.01); }
+    .dropzone-icon {
+      width: 72px; height: 72px; margin: 0 auto 24px; position: relative;
+      background: rgba(255,70,85,0.08); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .dropzone-icon svg { width: 32px; height: 32px; stroke: var(--accent-red); }
+    .dropzone-title { font-size: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-primary); margin-bottom: 8px; }
+    .dropzone-subtitle { font-size: 14px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; }
+    .dropzone-subtitle span { color: var(--accent-red); font-weight: 500; }
+
+    /* ===== PREVIEW / RESULT / LOADING / ERROR ===== */
+    .preview-container { margin-top: 32px; text-align: center; }
+    .preview-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+    .preview-image { max-width: 100%; max-height: 360px; border: 1px solid var(--border-color); object-fit: contain; background: var(--bg-secondary); }
+    .result-container { margin-top: 32px; }
+    .result-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 24px;
+    }
+    .result-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); }
+    .result-class { font-size: 28px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+    .result-class.reaver { color: #9b59b6; }
+    .result-class.prime { color: #f1c40f; }
+    .confidence-row { margin-bottom: 20px; }
+    .confidence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .confidence-name { font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); }
+    .confidence-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+    .confidence-track { width: 100%; height: 6px; background: var(--bg-secondary); overflow: hidden; }
+    .confidence-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+    .confidence-fill.reaver { background: linear-gradient(90deg, #7b3fa0, #9b59b6); }
+    .confidence-fill.prime { background: linear-gradient(90deg, #d4a800, #f1c40f); }
+    .loading-container { margin-top: 32px; text-align: center; padding: 32px; }
+    .loading-spinner {
+      width: 40px; height: 40px; border: 3px solid var(--border-color);
+      border-top-color: var(--accent-red); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+    }
+    .loading-text { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-container {
+      margin-top: 32px; padding: 20px 24px; background: rgba(255,70,85,0.08);
+      border: 1px solid rgba(255,70,85,0.3); display: flex; align-items: center; gap: 12px;
+    }
+    .error-icon { width: 20px; height: 20px; flex-shrink: 0; }
+    .error-icon svg { width: 100%; height: 100%; stroke: var(--accent-red); }
+    .error-text { font-size: 14px; color: var(--accent-red-hover); font-weight: 400; }
+
+    /* ===== POWERED BY ===== */
+    .powered-section { padding: 100px 48px; text-align: center; }
+    .powered-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
+      max-width: 1200px; margin: 64px auto 0;
+    }
+    .powered-card {
+      position: relative; overflow: hidden; border: 1px solid var(--border-color);
+      background: var(--bg-card); transition: all var(--transition-normal);
+    }
+    .powered-card:hover { border-color: var(--accent-red); transform: translateY(-4px); }
+    .powered-card-video {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
+    }
+    .powered-card-body { padding: 32px; }
+    .powered-card-title {
+      font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+    }
+    .powered-card-desc {
+      font-size: 14px; color: var(--text-muted); line-height: 1.6; font-weight: 400;
+    }
+    .powered-badge {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 48px;
+      padding: 12px 24px; border: 1px solid var(--border-color);
+      font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted);
+    }
+    .powered-badge-dot {
+      width: 8px; height: 8px; background: var(--accent-red); border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+
+    /* ===== SECOND SHOWCASE (web_img images) ===== */
+    .gallery-section { padding: 80px 0; overflow: hidden; }
+    .gallery-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+      max-width: 1400px; margin: 0 auto; padding: 0 48px;
+    }
+    .gallery-item {
+      position: relative; aspect-ratio: 16/10; overflow: hidden; cursor: default;
+    }
+    .gallery-item img {
+      width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease, filter 0.6s ease;
+      filter: brightness(0.7);
+    }
+    .gallery-item:hover img { transform: scale(1.06); filter: brightness(0.9); }
+
+    /* ===== ANNOUNCEMENTS ===== */
+    .announce-section { padding: 80px 48px; max-width: 1100; margin: 0 auto; }
+    .announce-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 56px; }
+    .announce-card {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      padding: 32px; transition: all var(--transition-normal); position: relative; overflow: hidden;
+    }
+    .announce-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent-red);
+    }
+    .announce-card:hover { border-color: var(--accent-red); transform: translateY(-2px); }
+    .announce-label {
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent-red); margin-bottom: 12px;
+    }
+    .announce-title {
+      font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+    }
+    .announce-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; font-weight: 400; }
+    .announce-date { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; margin-top: 16px; opacity: 0.6; }
+
+    /* ===== ANNOUNCE SHOWCASE ===== */
+    .announce-showcase {
+      display: grid; grid-template-columns: 1.2fr 1fr; gap: 0;
+      max-width: 1100px; margin: 56px auto 0;
+      border: 1px solid var(--border-color); background: var(--bg-card);
+      overflow: hidden;
+    }
+    .announce-video-wrap { position: relative; overflow: hidden; }
+    .announce-video {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      min-height: 360px;
+    }
+    .announce-video-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 60%, var(--bg-card) 100%);
+    }
+    .announce-content {
+      padding: 48px 40px; display: flex; flex-direction: column; justify-content: center;
+    }
+    .announce-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; background: rgba(255,70,85,0.1);
+      border: 1px solid rgba(255,70,85,0.25);
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--accent-red); width: fit-content; margin-bottom: 20px;
+    }
+    .announce-badge-dot {
+      width: 6px; height: 6px; background: var(--accent-red); border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .announce-version-title {
+      font-size: 28px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 24px; color: var(--text-primary);
+    }
+    .announce-list {
+      list-style: none; padding: 0; margin: 0;
+    }
+    .announce-list li {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 15px; color: var(--text-secondary); letter-spacing: 0.5px;
+      padding: 10px 0; border-bottom: 1px solid var(--border-color);
+    }
+    .announce-list li:last-child { border-bottom: none; }
+    .announce-list-icon {
+      width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+      background: rgba(255,70,85,0.1); color: var(--accent-red); flex-shrink: 0;
+    }
+    .announce-changelog { margin-top: 24px; }
+    .announce-changelog .announce-date { margin-top: 0; opacity: 1; font-weight: 500; }
+    @media (max-width: 768px) {
+      .announce-showcase { grid-template-columns: 1fr; }
+      .announce-video { min-height: 240px; }
+      .announce-video-overlay {
+        background: linear-gradient(180deg, transparent 60%, var(--bg-card) 100%);
+      }
+      .announce-content { padding: 32px 24px; }
+    }
+    @media (max-width: 768px) { .announce-grid { grid-template-columns: 1fr; } }
+
+    /* ===== FOOTER ===== */
+    .footer { border-top: 1px solid var(--border-color); padding: 48px 48px 32px; margin-top: 60px; }
+    .footer-top { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding-bottom: 32px; border-bottom: 1px solid var(--border-color); }
+    .footer-brand { display: flex; align-items: center; gap: 12px; }
+    .footer-logo-icon { height: 36px; width: auto; opacity: 0.6; }
+    .footer-logo-text { height: 14px; width: auto; opacity: 0.6; }
+    .footer-text { font-size: 12px; color: var(--text-muted); letter-spacing: 1px; }
+    .footer-social { display: flex; gap: 12px; }
+    .footer-social a {
+      width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border-color); color: var(--text-muted); text-decoration: none;
+      transition: all var(--transition-fast);
+    }
+    .footer-social a:hover { border-color: var(--accent-red); color: var(--accent-red); }
+    .footer-social a svg { width: 18px; height: 18px; fill: currentColor; }
+    .footer-bottom { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding-top: 24px; }
+    .footer-credits { font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px; line-height: 1.8; }
+    .footer-credits span { color: var(--text-secondary); }
+    .footer-creator { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+    .footer-creator span { color: var(--accent-red); font-weight: 600; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .navbar { padding: 0 24px; }
+      .navbar-links { gap: 20px; }
+      .classifier-layout { grid-template-columns: 1fr; gap: 48px; }
+      .classifier-info { padding-right: 0; text-align: center; }
+      .classifier-info .section-eyebrow, .classifier-info .section-title { text-align: center; }
+      .classifier-info .section-divider { margin: 24px auto 0; }
+      .powered-grid { grid-template-columns: 1fr; max-width: 500px; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); padding: 0 24px; }
+    }
+    @media (max-width: 768px) {
+      .navbar-links { display: none; }
+      .hero-title { font-size: 48px; }
+      .hero-actions { flex-direction: column; align-items: center; }
+      .classifier-card { padding: 32px 24px; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .footer-top, .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+      .classifier-section, .powered-section { padding: 60px 24px; }
+    }
+    @media (max-width: 480px) {
+      .hero { min-height: 600px; }
+      .hero-title { font-size: 36px; }
+      .btn { padding: 14px 24px; font-size: 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-video { animation: none; transform: scale(1); }
+      .hero-eyebrow, .hero-title, .hero-subtitle, .hero-actions { animation: none; opacity: 1; transform: none; }
+      .loading-spinner { animation: spin 1.2s linear infinite; }
+      .powered-badge-dot { animation: none; }
+      * { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
+
+    /* ===== NAVBAR ===== */
+    function Navbar() {
+      const [scrolled, setScrolled] = useState(false);
+      useEffect(() => {
+        const h = () => setScrolled(window.scrollY > 50);
+        window.addEventListener('scroll', h);
+        return () => window.removeEventListener('scroll', h);
+      }, []);
+      return (
+        <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+          <a href="#" className="navbar-logo">
+            <img src="../web_img/valo_logo.png" alt="VALORANT" className="navbar-logo-icon" />
+            <img src="../web_img/valorant_logo_text.avif" alt="VALORANT" className="navbar-logo-text" />
+          </a>
+          <ul className="navbar-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#classifier" className="active">Classifier</a></li>
+            <li><a href="#powered">Technology</a></li>
+            <li><a href="#announcements">Updates</a></li>
+            <li><a href="#" className="navbar-cta">Try Free</a></li>
+          </ul>
+        </nav>
+      );
+    }
+
+    /* ===== HERO ===== */
+    function Hero() {
+      return (
+        <section className="hero" id="hero">
+          <video className="hero-video" autoPlay muted loop playsInline>
+            <source src="../Animated/LNY_Sage-3_NightMarket.mp4" type="video/mp4" />
+          </video>
+          <div className="hero-overlay" />
+          <div className="hero-content">
+            <p className="hero-eyebrow">AI-Powered Identification</p>
+            <h1 className="hero-title">
+              Identify Your
+              <span>Skin Collection</span>
+            </h1>
+            <p className="hero-subtitle">
+              Drop any weapon skin image and our trained neural network will instantly identify bundle it belongs to.
+            </p>
+            <div className="hero-actions">
+              <a href="#classifier" className="btn btn-primary">
+                Start Classifying
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+              <a href="#powered" className="btn btn-secondary">Learn More</a>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ===== GALLERY (web_img grid) ===== */
+    function Gallery() {
+      const imgs = [
+        '../web_img/China_CG_Jett_Jump_Full.jpg',
+        '../web_img/China_CG_phxcool_fullres.jpg',
+        '../web_img/China_CG_Sagefire_Full.jpg',
+        '../web_img/China_CG_A2_Full.jpg',
+        '../web_img/China_CG_EndMap_Full.jpg',
+        '../web_img/China_CG_Haven_Overlook.jpg',
+      ];
+      return (
+        <section className="gallery-section">
+          <div className="gallery-grid">
+            {imgs.map((s, i) => (
+              <div className="gallery-item" key={i}>
+                <img src={s} alt="" />
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    /* ===== CLASSIFIER ===== */
+    function Classifier() {
+      const [preview, setPreview] = useState(null);
+      const [result, setResult] = useState(null);
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState(null);
+      const [dragOver, setDragOver] = useState(false);
+      const inputRef = useRef(null);
+
+      const classify = async (file) => {
+        setError(null); setResult(null); setLoading(true);
+        const fd = new FormData(); fd.append("file", file);
+        try {
+          const r = await fetch("http://localhost:8000/predict", { method: "POST", body: fd });
+          const d = await r.json();
+          if (d.error) setError(d.error); else setResult(d);
+        } catch { setError("Could not reach the API. Make sure api.py is running on port 8000."); }
+        finally { setLoading(false); }
+      };
+      const handleFile = (f) => { if (!f || !f.type.startsWith("image/")) return; setPreview(URL.createObjectURL(f)); classify(f); };
+      const onDrop = (e) => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); };
+      const pct = (v) => (v * 100).toFixed(1);
+
+      return (
+        <section className="classifier-section" id="classifier">
+          <div className="classifier-layout">
+            <div className="classifier-info">
+              <p className="section-eyebrow">Skin Classifier</p>
+              <h2 className="section-title">Identify Your Gun Skin</h2>
+              <div className="section-divider" />
+              <p className="classifier-desc">
+                Our EfficientNet-B0 model has been trained on thousands of weapon skin images to accurately classify Reaver and Prime collections with high confidence.
+              </p>
+              <div className="classifier-steps">
+                <div className="step"><div className="step-number">01</div><div className="step-text"><h4>Upload Image</h4><p>Drag and drop or click to upload any weapon skin screenshot</p></div></div>
+                <div className="step"><div className="step-number">02</div><div className="step-text"><h4>AI Analysis</h4><p>Our neural network analyzes visual features in real-time</p></div></div>
+                <div className="step"><div className="step-number">03</div><div className="step-text"><h4>Get Results</h4><p>See the predicted skin collection with confidence scores</p></div></div>
+              </div>
+            </div>
+
+            <div className="classifier-card">
+              <div className="classifier-card-bg">
+                <img src="../web_img/9146891368df21c1cae7d528829cddde64783034-3440x1020.avif" alt="" />
+              </div>
+
+              <div className={`dropzone ${dragOver ? "dragover" : ""}`}
+                onDrop={onDrop} onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)} onClick={() => inputRef.current?.click()}>
+                <input ref={inputRef} type="file" accept="image/*" onChange={(e) => handleFile(e.target.files[0])} style={{ display: "none" }} />
+                <div className="dropzone-icon">
+                  <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                </div>
+                <p className="dropzone-title">Upload Skin Image</p>
+                <p className="dropzone-subtitle"><span>Click to browse</span> or drag and drop</p>
+              </div>
+
+              {preview && <div className="preview-container"><p className="preview-label">Uploaded Image</p><img className="preview-image" src={preview} alt="Uploaded skin" /></div>}
+              {loading && <div className="loading-container"><div className="loading-spinner" /><p className="loading-text">Analyzing Skin...</p></div>}
+              {error && <div className="error-container"><div className="error-icon"><svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><p className="error-text">{error}</p></div>}
+              {result && (
+                <div className="result-container">
+                  <div className="result-header"><span className="result-label">Prediction</span><span className={`result-class ${result.predicted}`}>{result.predicted}</span></div>
+                  {Object.entries(result.scores).sort((a, b) => b[1] - a[1]).map(([name, score]) => (
+                    <div className="confidence-row" key={name}>
+                      <div className="confidence-header"><span className="confidence-name">{name}</span><span className="confidence-value">{pct(score)}%</span></div>
+                      <div className="confidence-track"><div className={`confidence-fill ${name}`} style={{ width: `${pct(score)}%` }} /></div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ===== POWERED BY ===== */
+    function PoweredBy() {
+      const cards = [
+        { video: '../Animated/LNY_Sage-2_ShoppingA.mp4', title: 'EfficientNet-B0', desc: "Google's EfficientNet architecture optimized for mobile and edge deployment with maximum accuracy." },
+        { video: '../Animated/LNY_Sage-2_ShoppingB.mp4', title: 'Transfer Learning', desc: 'Pre-trained on ImageNet and fine-tuned on thousands of VALORANT weapon skin images.' },
+        { video: '../Animated/LNY_Sage-2_ShoppingC.mp4', title: 'Real-Time Inference', desc: 'Optimized pipeline delivers instant predictions with high confidence scores.' },
+      ];
+      return (
+        <section className="powered-section" id="powered">
+          <p className="section-eyebrow">Technology</p>
+          <h2 className="section-title">Powered By</h2>
+          <div className="section-divider" />
+          <div className="powered-grid">
+            {cards.map((c, i) => (
+              <div className="powered-card" key={i}>
+                <video className="powered-card-video" autoPlay muted loop playsInline>
+                  <source src={c.video} type="video/mp4" />
+                </video>
+                <div className="powered-card-body">
+                  <h3 className="powered-card-title">{c.title}</h3>
+                  <p className="powered-card-desc">{c.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    /* ===== ANNOUNCEMENTS ===== */
+    function Announcements() {
+      return (
+        <section className="announce-section" id="announcements">
+          <div className="section-header" style={{ textAlign: 'center' }}>
+            <p className="section-eyebrow">Version</p>
+            <h2 className="section-title">v1.0.0</h2>
+            <div className="section-divider" />
+          </div>
+          <div className="announce-showcase">
+            <div className="announce-video-wrap">
+              <video className="announce-video" autoPlay muted loop playsInline>
+                <source src="../Animated/LNY_Sage-5_CallBack.mp4" type="video/mp4" />
+              </video>
+              <div className="announce-video-overlay" />
+            </div>
+            <div className="announce-content">
+              <div className="announce-badge">
+                <div className="announce-badge-dot" />
+                <span>Latest Release</span>
+              </div>
+              <h3 className="announce-version-title">What's New</h3>
+              <ul className="announce-list">
+                <li>
+                  <span className="announce-list-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                  <span>Added Prime bundle</span>
+                </li>
+                <li>
+                  <span className="announce-list-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                  <span>Added Reaver bundle</span>
+                </li>
+              </ul>
+              <div className="announce-changelog">
+                <span className="announce-date">26/072026</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ===== FOOTER ===== */
+    function Footer() {
+      return (
+        <footer className="footer">
+          <div className="footer-top">
+            <div className="footer-brand">
+              <img src="../web_img/valo_logo.png" alt="VALORANT" className="footer-logo-icon" />
+              <img src="../web_img/valorant_logo_text.avif" alt="VALORANT" className="footer-logo-text" />
+              <span className="footer-text">Skin Classifier</span>
+            </div>
+            <div className="footer-social">
+              <a href="#" aria-label="Instagram">
+                <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              </a>
+              <a href="#" aria-label="LinkedIn">
+                <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </a>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p className="footer-credits">
+              All images and assets are from the <span>official VALORANT website</span> (playvalorant.com).<br />
+              Valorant and all related properties are trademarks of <span>Riot Games, Inc.</span>
+            </p>
+            <p className="footer-creator">
+              Created by <span>Lance Christian C. Crucis</span>
+            </p>
+          </div>
+        </footer>
+      );
+    }
+
+    /* ===== APP ===== */
+    function App() {
+      return (
+        <>
+          <Navbar />
+          <Hero />
+          <Classifier />
+          <Gallery />
+          <PoweredBy />
+          <Announcements />
+          <Footer />
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

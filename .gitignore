@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Data & checkpoints
+data/**/*.jpg
+data/**/*.jpeg
+data/**/*.png
+data/**/*.webp
+checkpoints/*.pth
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Outputs
+outputs/
+
+# Large media (hosted externally, not in repo)
+Animated/
+web_img/
