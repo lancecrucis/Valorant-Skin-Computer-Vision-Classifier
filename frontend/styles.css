@@ -28,11 +28,11 @@ body {
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 48px; height: 80px;
-  background: linear-gradient(180deg, rgba(15,25,35,0.95) 0%, rgba(15,25,35,0) 100%);
+  background: linear-gradient(180deg, rgba(17,17,17,0.95) 0%, rgba(17,17,17,0) 100%);
 
   transition: background var(--transition-normal);
 }
-.navbar.scrolled { background: rgba(15,25,35,0.98); box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+.navbar.scrolled { background: rgba(17,17,17,0.98); box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
 .navbar-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
 .navbar-logo-icon { height: 48px; width: auto; filter: brightness(1.1); }
 .navbar-logo-text { height: 18px; width: auto; filter: brightness(1.1); }
@@ -212,7 +212,17 @@ body {
 .error-text { font-size: 14px; color: var(--accent-red-hover); font-weight: 400; }
 
 /* ===== POWERED BY ===== */
-.powered-section { padding: 100px 48px; text-align: center; }
+.powered-section { padding: 130px 48px; text-align: center; position: relative; overflow: hidden; background: #0d1117;}
+.powered-section::after {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 20%, transparent 90%, var(--bg-secondary) 100%);
+}
+.powered-section::before {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  background: url('../Animated/valobg.png') center/cover no-repeat;
+  opacity: 0.7;
+}
+.powered-section > * { position: relative; z-index: 1; }
 .powered-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
   max-width: 1200px; margin: 64px auto 0;
@@ -330,24 +340,24 @@ body {
 .announce-changelog .announce-date { margin-top: 0; opacity: 1; font-weight: 500; }
 
 /* ===== FOOTER ===== */
-.footer { border-top: 1px solid var(--border-color); padding: 48px 48px 32px; margin-top: 60px; }
-.footer-top { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding-bottom: 32px; border-bottom: 1px solid var(--border-color); }
+.footer { background: #111111; border-top: 1px solid #333333; padding: 48px 48px 32px; margin-top: 60px; }
+.footer-top { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding-bottom: 32px; border-bottom: 1px solid #333333; }
 .footer-brand { display: flex; align-items: center; gap: 12px; }
-.footer-logo-icon { height: 36px; width: auto; opacity: 0.6; }
-.footer-logo-text { height: 14px; width: auto; opacity: 0.6; }
-.footer-text { font-size: 12px; color: var(--text-muted); letter-spacing: 1px; }
+.footer-logo-icon { height: 36px; width: auto; opacity: 0.8; }
+.footer-logo-text { height: 14px; width: auto; opacity: 0.8; }
+.footer-text { font-size: 12px; color: #b0b0b0; letter-spacing: 1px; }
 .footer-social { display: flex; gap: 12px; }
 .footer-social a {
   width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-  border: 1px solid var(--border-color); color: var(--text-muted); text-decoration: none;
+  border: 1px solid #333333; color: #b0b0b0; text-decoration: none;
   transition: all var(--transition-fast);
 }
 .footer-social a:hover { border-color: var(--accent-red); color: var(--accent-red); }
 .footer-social a svg { width: 18px; height: 18px; fill: currentColor; }
 .footer-bottom { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding-top: 24px; }
-.footer-credits { font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px; line-height: 1.8; }
-.footer-credits span { color: var(--text-secondary); }
-.footer-creator { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+.footer-credits { font-size: 11px; color: #b0b0b0; letter-spacing: 0.5px; line-height: 1.8; }
+.footer-credits span { color: #e0e0e0; }
+.footer-creator { font-size: 11px; color: #b0b0b0; letter-spacing: 1px; text-transform: uppercase; }
 .footer-creator span { color: var(--accent-red); font-weight: 600; }
 
 /* ===== RESPONSIVE ===== */
