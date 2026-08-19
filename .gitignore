@@ -5,6 +5,7 @@ __pycache__/
 .venv/
 
 # Data & checkpoints
+data/
 data/**/*.jpg
 data/**/*.jpeg
 data/**/*.png

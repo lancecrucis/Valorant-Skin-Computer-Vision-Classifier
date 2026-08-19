@@ -6,12 +6,12 @@
     "reaver",
     "prime",
     "mystbloom",
-    "Elderflame",
-    "Glitchpop",
-    "Nebula",
-    "Oni",
-    "Prism",
-    "Sovereign"
+    "elderflame",
+    "glitchpop",
+    "nebula",
+    "oni",
+    "prism",
+    "sovereign"
   ],
   "image_size": 224,
   "model": "efficientnet_b0"

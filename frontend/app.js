@@ -1,25 +1,37 @@
-const { useState, useRef, useEffect } = React;
+const { useState, useRef, useEffect, useCallback } = React;
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const API_URL = "http://localhost:8000/predict";
 
 /* ===== NAVBAR ===== */
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', h);
-    return () => window.removeEventListener('scroll', h);
+    window.addEventListener("scroll", h);
+    return () => window.removeEventListener("scroll", h);
   }, []);
+  const closeMenu = () => setMenuOpen(false);
   return (
-    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+    <nav className={`navbar ${scrolled ? "scrolled" : ""} ${menuOpen ? "open" : ""}`}>
       <a href="#" className="navbar-logo">
         <img src="../web_img/valo_logo.png" alt="VALORANT" className="navbar-logo-icon" />
         <img src="../web_img/valorant_logo_text.avif" alt="VALORANT" className="navbar-logo-text" />
       </a>
+      <button
+        className={`navbar-hamburger ${menuOpen ? "open" : ""}`}
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Toggle navigation menu"
+        aria-expanded={menuOpen}
+      >
+        <span /><span /><span />
+      </button>
       <ul className="navbar-links">
-        <li><a href="#hero">Home</a></li>
-        <li><a href="#classifier" className="active">Classifier</a></li>
-        <li><a href="#powered">Technology</a></li>
-        <li><a href="#announcements">Updates</a></li>
-        <li><a href="#" className="navbar-cta">Try Free</a></li>
+        <li><a href="#hero" onClick={closeMenu}>Home</a></li>
+        <li><a href="#classifier" className="active" onClick={closeMenu}>Classifier</a></li>
+        <li><a href="#powered" onClick={closeMenu}>Technology</a></li>
+        <li><a href="#announcements" onClick={closeMenu}>Updates</a></li>
       </ul>
     </nav>
   );
@@ -58,29 +70,6 @@ function Hero() {
   );
 }
 
-/* ===== GALLERY (web_img grid) ===== */
-// function Gallery() {
-//   const imgs = [
-//     '../web_img/China_CG_Jett_Jump_Full.jpg',
-//     '../web_img/China_CG_phxcool_fullres.jpg',
-//     '../web_img/China_CG_Sagefire_Full.jpg',
-//     '../web_img/China_CG_A2_Full.jpg',
-//     '../web_img/China_CG_EndMap_Full.jpg',
-//     '../web_img/China_CG_Haven_Overlook.jpg',
-//   ];
-//   return (
-//     <section className="gallery-section">
-//       <div className="gallery-grid">
-//         {imgs.map((s, i) => (
-//           <div className="gallery-item" key={i}>
-//             <img src={s} alt="" />
-//           </div>
-//         ))}
-//       </div>
-//     </section>
-//   );
-// }
-
 /* ===== CLASSIFIER ===== */
 function Classifier() {
   const [preview, setPreview] = useState(null);
@@ -89,19 +78,81 @@ function Classifier() {
   const [error, setError] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef(null);
+  const abortRef = useRef(null);
+  const lastFileRef = useRef(null);
 
-  const classify = async (file) => {
-    setError(null); setResult(null); setLoading(true);
-    const fd = new FormData(); fd.append("file", file);
+  const classify = useCallback(async (file) => {
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    setError(null);
+    setResult(null);
+    setLoading(true);
+    lastFileRef.current = file;
+
+    const fd = new FormData();
+    fd.append("file", file);
     try {
-      const r = await fetch("http://localhost:8000/predict", { method: "POST", body: fd });
+      const r = await fetch(API_URL, { method: "POST", body: fd, signal: controller.signal });
       const d = await r.json();
-      if (d.error) setError(d.error); else setResult(d);
-    } catch { setError("Could not reach the API. Make sure api.py is running on port 8000."); }
-    finally { setLoading(false); }
-  };
-  const handleFile = (f) => { if (!f || !f.type.startsWith("image/")) return; setPreview(URL.createObjectURL(f)); classify(f); };
-  const onDrop = (e) => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); };
+      if (!r.ok) {
+        setError(d.detail || "Prediction failed.");
+      } else if (d.error) {
+        setError(d.error);
+      } else {
+        setResult(d);
+      }
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        setError("Could not reach the API. Make sure api.py is running on port 8000.");
+      }
+    } finally {
+      if (!controller.signal.aborted) setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (abortRef.current) abortRef.current.abort();
+    };
+  }, []);
+
+  const handleFile = useCallback((f) => {
+    if (!f) return;
+    if (!f.type.startsWith("image/")) {
+      setError("Invalid file type. Please upload a JPEG, PNG, or WebP image.");
+      return;
+    }
+    if (f.size > MAX_FILE_SIZE) {
+      setError(`File too large (${(f.size / (1024 * 1024)).toFixed(1)}MB). Max size: 10MB.`);
+      return;
+    }
+    if (preview) URL.revokeObjectURL(preview);
+    setPreview(URL.createObjectURL(f));
+    classify(f);
+  }, [preview, classify]);
+
+  const onDrop = useCallback((e) => {
+    e.preventDefault();
+    setDragOver(false);
+    handleFile(e.dataTransfer.files[0]);
+  }, [handleFile]);
+
+  const handleRetry = useCallback(() => {
+    if (lastFileRef.current) classify(lastFileRef.current);
+  }, [classify]);
+
+  const handleClear = useCallback(() => {
+    if (abortRef.current) abortRef.current.abort();
+    if (preview) URL.revokeObjectURL(preview);
+    setPreview(null);
+    setResult(null);
+    setError(null);
+    setLoading(false);
+    lastFileRef.current = null;
+  }, [preview]);
+
   const pct = (v) => (v * 100).toFixed(1);
 
   return (
@@ -126,24 +177,45 @@ function Classifier() {
             <img src="../web_img/9146891368df21c1cae7d528829cddde64783034-3440x1020.avif" alt="" />
           </div>
 
-          <div className={`dropzone ${dragOver ? "dragover" : ""}`}
-            onDrop={onDrop} onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)} onClick={() => inputRef.current?.click()}>
-            <input ref={inputRef} type="file" accept="image/*" onChange={(e) => handleFile(e.target.files[0])} style={{ display: "none" }} />
-            <div className="dropzone-icon">
-              <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
-              </svg>
+          {!preview && !loading && !result && (
+            <div
+              className={`dropzone ${dragOver ? "dragover" : ""}`}
+              onDrop={onDrop}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onClick={() => inputRef.current?.click()}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); } }}
+              role="button"
+              tabIndex={0}
+              aria-label="Upload skin image"
+            >
+              <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleFile(e.target.files[0])} style={{ display: "none" }} />
+              <div className="dropzone-icon">
+                <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <p className="dropzone-title">Upload Skin Image</p>
+              <p className="dropzone-subtitle"><span>Click to browse</span> or drag and drop</p>
             </div>
-            <p className="dropzone-title">Upload Skin Image</p>
-            <p className="dropzone-subtitle"><span>Click to browse</span> or drag and drop</p>
-          </div>
+          )}
 
           {preview && <div className="preview-container"><p className="preview-label">Uploaded Image</p><img className="preview-image" src={preview} alt="Uploaded skin" /></div>}
           {loading && <div className="loading-container"><div className="loading-spinner" /><p className="loading-text">Analyzing Skin...</p></div>}
-          {error && <div className="error-container"><div className="error-icon"><svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><p className="error-text">{error}</p></div>}
+          {error && (
+            <div className="error-container">
+              <div className="error-icon"><svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+              <div>
+                <p className="error-text">{error}</p>
+                <div className="error-actions">
+                  {lastFileRef.current && <button className="btn-sm btn-retry" onClick={handleRetry}>Retry</button>}
+                  <button className="btn-sm btn-clear" onClick={handleClear}>Clear</button>
+                </div>
+              </div>
+            </div>
+          )}
           {result && (
             <div className="result-container">
               <div className="result-header"><span className="result-label">Prediction</span><span className={`result-class ${result.predicted}`}>{result.predicted}</span></div>
@@ -153,6 +225,9 @@ function Classifier() {
                   <div className="confidence-track"><div className={`confidence-fill ${name}`} style={{ width: `${pct(score)}%` }} /></div>
                 </div>
               ))}
+              <div className="result-actions">
+                <button className="btn-sm btn-clear" onClick={handleClear}>Upload Another</button>
+              </div>
             </div>
           )}
         </div>
@@ -215,13 +290,13 @@ function Announcements() {
           <ul className="announce-list">
             <li>
               <span className="announce-list-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
               <span>Added Prime bundle</span>
             </li>
             <li>
               <span className="announce-list-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
               <span>Added Reaver bundle</span>
             </li>
@@ -274,7 +349,6 @@ function App() {
       <Navbar />
       <Hero />
       <Classifier />
-      {/* <Gallery /> */}
       <PoweredBy />
       <Announcements />
       <Footer />
