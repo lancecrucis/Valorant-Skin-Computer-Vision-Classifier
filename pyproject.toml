@@ -1,6 +1,6 @@
 [project]
 name = "valorant-skin-classifier"
-version = "0.1.0"
+version = "1.1.0"
 description = "Valorant gun skin image classifier using PyTorch and torchvision"
 readme = "README.md"
 requires-python = "==3.12.*"

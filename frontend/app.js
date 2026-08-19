@@ -271,7 +271,7 @@ function Announcements() {
     <section className="announce-section" id="announcements">
       <div className="section-header" style={{ textAlign: 'center' }}>
         <p className="section-eyebrow">Version</p>
-        <h2 className="section-title">v1.0.0</h2>
+        <h2 className="section-title">v1.1.0</h2>
         <div className="section-divider" />
       </div>
       <div className="announce-showcase">
@@ -292,13 +292,13 @@ function Announcements() {
               <span className="announce-list-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
-              <span>Added Prime bundle</span>
+              <span>Added 7 new bundles (Mystbloom, Elderflame, Glitchpop, Nebula, Oni, Prism, Sovereign)</span>
             </li>
             <li>
               <span className="announce-list-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
-              <span>Added Reaver bundle</span>
+              <span>Security hardening and mobile responsiveness fixes</span>
             </li>
           </ul>
           <div className="announce-changelog">
