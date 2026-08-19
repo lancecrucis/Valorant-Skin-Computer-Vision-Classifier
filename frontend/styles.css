@@ -67,6 +67,30 @@ body {
   transform: scale(1.05); animation: heroZoom 20s ease-in-out infinite alternate;
 }
 @keyframes heroZoom { from { transform: scale(1.05); } to { transform: scale(1.12); } }
+
+/* ===== PARTICLES ===== */
+.particles {
+  position: absolute; inset: 0; z-index: 5; pointer-events: none; overflow: hidden;
+}
+.particle {
+  position: absolute; width: 2px; height: 20px; background: rgba(54,243,191,0.5);
+  animation: floatUp linear infinite;
+}
+.particle:nth-child(1) { left: 10%; animation-duration: 8s; animation-delay: 0s; height: 15px; }
+.particle:nth-child(2) { left: 20%; animation-duration: 12s; animation-delay: 1s; height: 25px; }
+.particle:nth-child(3) { left: 35%; animation-duration: 10s; animation-delay: 2s; height: 18px; }
+.particle:nth-child(4) { left: 50%; animation-duration: 14s; animation-delay: 0.5s; height: 12px; }
+.particle:nth-child(5) { left: 65%; animation-duration: 9s; animation-delay: 3s; height: 30px; }
+.particle:nth-child(6) { left: 75%; animation-duration: 11s; animation-delay: 1.5s; height: 22px; }
+.particle:nth-child(7) { left: 85%; animation-duration: 13s; animation-delay: 2.5s; height: 16px; }
+.particle:nth-child(8) { left: 92%; animation-duration: 7s; animation-delay: 0.8s; height: 20px; }
+@keyframes floatUp {
+  0% { bottom: -10px; opacity: 0; transform: translateX(0); }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { bottom: 110%; opacity: 0; transform: translateX(40px); }
+}
+
 .hero-overlay {
   position: absolute; inset: 0;
   background: linear-gradient(180deg, rgba(15,25,35,0.6) 0%, rgba(15,25,35,0.3) 40%, rgba(15,25,35,0.5) 70%, rgba(15,25,35,1) 100%);
@@ -215,7 +239,7 @@ body {
 .powered-section { padding: 130px 48px; text-align: center; position: relative; overflow: hidden; background: #0d1117;}
 .powered-section::after {
   content: ''; position: absolute; inset: 0; z-index: 0;
-  background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 20%, transparent 90%, var(--bg-secondary) 100%);
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 30%, transparent 90%, var(--bg-secondary) 100%);
 }
 .powered-section::before {
   content: ''; position: absolute; inset: 0; z-index: 0;
@@ -231,7 +255,7 @@ body {
   position: relative; overflow: hidden; border: 1px solid var(--border-color);
   background: var(--bg-card); transition: all var(--transition-normal);
 }
-.powered-card:hover { border-color: var(--accent-red); transform: translateY(-4px); }
+.powered-card:hover { border-color: #36F3BF; transform: translateY(-4px);  border-width: 3px; }
 .powered-card-video {
   width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
 }

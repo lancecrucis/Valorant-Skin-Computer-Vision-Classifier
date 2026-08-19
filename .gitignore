@@ -10,6 +10,7 @@ data/**/*.jpeg
 data/**/*.png
 data/**/*.webp
 checkpoints/*.pth
+data.tar.gz
 
 # IDE
 .vscode/

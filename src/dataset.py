@@ -4,7 +4,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 
-WEAPONS = ["reaver", "prime","mystbloom"]
+WEAPONS = ["reaver", "prime","mystbloom", "Elderflame", "Glitchpop", "Nebula", "Oni", "Prism", "Sovereign" ]
 WEAPON_TO_IDX = {w: i for i, w in enumerate(WEAPONS)}
 
 

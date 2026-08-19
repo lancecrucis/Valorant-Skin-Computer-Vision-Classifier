@@ -1,11 +1,17 @@
 {
-  "best_epoch": 4,
-  "best_val_acc": 1.0,
-  "num_classes": 3,
+  "best_epoch": 3,
+  "best_val_acc": 0.9887,
+  "num_classes": 9,
   "weapons": [
     "reaver",
     "prime",
-    "mystbloom"
+    "mystbloom",
+    "Elderflame",
+    "Glitchpop",
+    "Nebula",
+    "Oni",
+    "Prism",
+    "Sovereign"
   ],
   "image_size": 224,
   "model": "efficientnet_b0"

@@ -33,6 +33,10 @@ function Hero() {
         <source src="../Animated/LNY_Sage-3_NightMarket.mp4" type="video/mp4" />
       </video>
       <div className="hero-overlay" />
+      <div className="particles">
+        <div className="particle" /><div className="particle" /><div className="particle" /><div className="particle" />
+        <div className="particle" /><div className="particle" /><div className="particle" /><div className="particle" />
+      </div>
       <div className="hero-content">
         <p className="hero-eyebrow">AI-Powered Identification</p>
         <h1 className="hero-title">
