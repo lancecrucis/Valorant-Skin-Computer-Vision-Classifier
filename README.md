@@ -1,15 +1,16 @@
 # Valorant Skin Classifier
 
-Image classifier for Valorant gun skins using transfer learning with ResNet18.
+AI-powered Valorant weapon skin bundle classifier with a web interface. Upload any weapon skin screenshot and the model identifies which bundle it belongs to.
 
-## Categories
+## Skin Bundles (9)
 
-- Phantom
-- Vandal
-- Operator
-- Classic
-- Ghost
-- Sheriff
+reaver, prime, mystbloom, elderflame, glitchpop, nebula, oni, prism, sovereign
+
+## Tech Stack
+
+- **Model:** EfficientNet-B0 (transfer learning from ImageNet)
+- **Backend:** FastAPI + PyTorch
+- **Frontend:** React 18 (CDN), vanilla CSS
 
 ## Setup
 
@@ -17,21 +18,15 @@ Image classifier for Valorant gun skins using transfer learning with ResNet18.
 uv sync
 ```
 
-## Dataset
+## Run the Website
 
-Place images in `data/<weapon>/` folders:
+Start the API server:
 
-```
-data/
-  phantom/     # Phantom skin images
-  vandal/      # Vandal skin images
-  operator/    # Operator skin images
-  classic/     # Classic skin images
-  ghost/       # Ghost skin images
-  sheriff/     # Sheriff skin images
+```bash
+uv run python api.py
 ```
 
-Supported formats: `.jpg`, `.jpeg`, `.png`, `.webp`
+Then open `frontend/index.html` in your browser (or serve it with any static file server).
 
 ## Training
 
@@ -41,21 +36,48 @@ uv run python train.py
 
 Checkpoints saved to `checkpoints/best_model.pth`.
 
-## Prediction
+## CLI Prediction
 
 ```bash
 uv run python predict.py path/to/image.jpg
 ```
 
+## Dataset
+
+Place images in `data/<bundle>/` folders:
+
+```
+data/
+  reaver/
+  prime/
+  mystbloom/
+  elderflame/
+  glitchpop/
+  nebula/
+  oni/
+  prism/
+  sovereign/
+```
+
+Supported formats: `.jpg`, `.jpeg`, `.png`, `.webp`
+
 ## Project Structure
 
 ```
-src/
-  dataset.py            # Dataset loader
-  models/
-    classifier.py       # ResNet18 model
-  utils/
-    transforms.py       # Image transforms
+api.py                  # FastAPI server
 train.py                # Training script
-predict.py              # Inference script
+predict.py              # CLI inference
+frontend/
+  index.html            # SPA entry point
+  app.js                # React components
+  styles.css            # Styling
+src/
+  dataset.py            # Dataset loader + WEAPONS list
+  models/
+    classifier.py       # EfficientNet-B0 model
+  utils/
+    transforms.py       # Image preprocessing
+checkpoints/
+  best_model.pth        # Trained model weights
+  model_meta.json       # Model metadata
 ```
