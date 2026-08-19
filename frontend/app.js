@@ -149,7 +149,7 @@ function Classifier() {
               <div className="result-header"><span className="result-label">Prediction</span><span className={`result-class ${result.predicted}`}>{result.predicted}</span></div>
               {Object.entries(result.scores).sort((a, b) => b[1] - a[1]).map(([name, score]) => (
                 <div className="confidence-row" key={name}>
-                  <div className="confidence-header"><span className="confidence-name">{name}</span><span className="confidence-value">{pct(score)}%</span></div>
+                  <div className="confidence-header"><span className={`confidence-name ${name}`}>{name}</span><span className="confidence-value">{pct(score)}%</span></div>
                   <div className="confidence-track"><div className={`confidence-fill ${name}`} style={{ width: `${pct(score)}%` }} /></div>
                 </div>
               ))}

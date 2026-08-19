@@ -209,16 +209,37 @@ body {
 .result-class { font-size: 28px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
 .result-class.reaver { color: #632b79; }
 .result-class.prime { color: #f1c40f; }
-.result-class.prime { color: #ff88b8; }
+.result-class.Sovereign { color: #e8c547; }
+.result-class.Prism { color: #b388ff; }
+.result-class.Elderflame { color: #ff5722; }
+.result-class.Oni { color: #81c784; }
+.result-class.Glitchpop { color: #e91e8c; }
+.result-class.Nebula { color: #9c27b0; }
+.result-class.mystbloom { color: #f06292; }
 .confidence-row { margin-bottom: 20px; }
 .confidence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .confidence-name { font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); }
+.confidence-name.reaver { color: #9b59b6; }
+.confidence-name.prime { color: #f1c40f; }
+.confidence-name.Sovereign { color: #e8c547; }
+.confidence-name.Prism { color: #b388ff; }
+.confidence-name.Elderflame { color: #ff5722; }
+.confidence-name.Oni { color: #81c784; }
+.confidence-name.Glitchpop { color: #e91e8c; }
+.confidence-name.Nebula { color: #9c27b0; }
+.confidence-name.mystbloom { color: #f06292; }
 .confidence-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .confidence-track { width: 100%; height: 6px; background: var(--bg-secondary); overflow: hidden; }
 .confidence-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
 .confidence-fill.reaver { background: linear-gradient(90deg, #7b3fa0, #9b59b6); }
 .confidence-fill.prime { background: linear-gradient(90deg, #d4a800, #f1c40f); }
-.confidence-fill.mystbloom { background: linear-gradient(90deg, #c4367a, #e74c8b); }
+.confidence-fill.Sovereign { background: linear-gradient(90deg, #c9a834, #e8c547); }
+.confidence-fill.Prism { background: linear-gradient(90deg, #7c4dff, #b388ff); }
+.confidence-fill.Elderflame { background: linear-gradient(90deg, #d4380d, #ff5722); }
+.confidence-fill.Oni { background: linear-gradient(90deg, #4caf50, #81c784); }
+.confidence-fill.Glitchpop { background: linear-gradient(90deg, #c2185b, #e91e8c); }
+.confidence-fill.Nebula { background: linear-gradient(90deg, #7b1fa2, #9c27b0); }
+.confidence-fill.mystbloom { background: linear-gradient(90deg, #c4367a, #f06292); }
 .loading-container { margin-top: 32px; text-align: center; padding: 32px; }
 .loading-spinner {
   width: 40px; height: 40px; border: 3px solid var(--border-color);
