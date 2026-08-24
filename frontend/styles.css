@@ -79,29 +79,6 @@ body {
 }
 @keyframes heroZoom { from { transform: scale(1.05); } to { transform: scale(1.12); } }
 
-/* ===== PARTICLES ===== */
-.particles {
-  position: absolute; inset: 0; z-index: 5; pointer-events: none; overflow: hidden;
-}
-.particle {
-  position: absolute; width: 2px; height: 20px; background: rgba(54,243,191,0.5);
-  animation: floatUp linear infinite;
-}
-.particle:nth-child(1) { left: 10%; animation-duration: 8s; animation-delay: 0s; height: 15px; }
-.particle:nth-child(2) { left: 20%; animation-duration: 12s; animation-delay: 1s; height: 25px; }
-.particle:nth-child(3) { left: 35%; animation-duration: 10s; animation-delay: 2s; height: 18px; }
-.particle:nth-child(4) { left: 50%; animation-duration: 14s; animation-delay: 0.5s; height: 12px; }
-.particle:nth-child(5) { left: 65%; animation-duration: 9s; animation-delay: 3s; height: 30px; }
-.particle:nth-child(6) { left: 75%; animation-duration: 11s; animation-delay: 1.5s; height: 22px; }
-.particle:nth-child(7) { left: 85%; animation-duration: 13s; animation-delay: 2.5s; height: 16px; }
-.particle:nth-child(8) { left: 92%; animation-duration: 7s; animation-delay: 0.8s; height: 20px; }
-@keyframes floatUp {
-  0% { bottom: -10px; opacity: 0; transform: translateX(0); }
-  10% { opacity: 0.6; }
-  90% { opacity: 0.6; }
-  100% { bottom: 110%; opacity: 0; transform: translateX(40px); }
-}
-
 .hero-overlay {
   position: absolute; inset: 0;
   background: linear-gradient(180deg, rgba(15,25,35,0.6) 0%, rgba(15,25,35,0.3) 40%, rgba(15,25,35,0.5) 70%, rgba(15,25,35,1) 100%);
@@ -212,17 +189,9 @@ body {
 /* ===== PREVIEW / RESULT / LOADING / ERROR ===== */
 .classifier-section { scroll-margin-top: 96px; }
 .preview-container { margin-top: 32px; text-align: center; }
-.preview-frame { position: relative; display: inline-block; max-width: 100%; }
 .preview-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
-.preview-image { max-width: 100%; max-height: 360px; border: 1px solid var(--border-color); object-fit: contain; background: var(--bg-secondary); display: block; }
-.preview-container.scanning .preview-frame { overflow: hidden; }
-.scanline {
-  position: absolute; left: 0; right: 0; top: 0; height: 3px;
-  background: linear-gradient(90deg, transparent, #36f3bf, transparent);
-  box-shadow: 0 0 14px rgba(54, 243, 191, 0.9);
-  animation: scanSweep 1.8s ease-in-out infinite alternate;
-}
-@keyframes scanSweep { from { top: 0; } to { top: calc(100% - 3px); } }
+.preview-image { max-width: 100%; max-height: 360px; border: 1px solid var(--border-color); object-fit: contain; background: var(--bg-secondary); }
+
 .result-container { margin-top: 32px; }
 .result-header {
   display: flex; justify-content: space-between; align-items: center;
@@ -325,26 +294,6 @@ body {
 }
 .loading-text { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); }
 @keyframes spin { to { transform: rotate(360deg); } }
-.loading-bar {
-  width: min(320px, 80%); height: 6px; margin: 20px auto 10px;
-  background: var(--bg-secondary); border: 1px solid var(--border-color);
-  overflow: hidden;
-}
-.loading-bar-fill {
-  height: 100%; width: 0%;
-  background: linear-gradient(90deg, var(--accent-red), #ff8a93);
-  transition: width 0.35s ease;
-}
-.loading-percent {
-  font-size: 12px; letter-spacing: 2px; color: var(--text-secondary);
-  font-weight: 600; font-variant-numeric: tabular-nums;
-}
-.loading-phase {
-  font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-  color: var(--text-muted); margin-top: 8px; min-height: 16px;
-}
-.loading-phase::after { content: ""; display: inline-block; width: 16px; text-align: left; animation: dots 1.3s steps(1) infinite; }
-@keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
 .error-container {
   margin-top: 32px; padding: 20px 24px; background: rgba(255,70,85,0.08);
   border: 1px solid rgba(255,70,85,0.3); display: flex; align-items: center; gap: 12px;
@@ -557,6 +506,6 @@ body {
   .hero-video { animation: none; transform: scale(1); }
   .hero-eyebrow, .hero-title, .hero-subtitle, .hero-actions { animation: none; opacity: 1; transform: none; }
   .loading-spinner { animation: none; border-top-color: var(--accent-red); opacity: 0.6; }
-  .powered-badge-dot, .announce-badge-dot, .particle { animation: none; }
+  .powered-badge-dot, .announce-badge-dot { animation: none; }
   * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }

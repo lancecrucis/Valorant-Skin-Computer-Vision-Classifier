@@ -1,13 +1,7 @@
 const { useState, useRef, useEffect, useCallback } = React;
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const API_URL = "/predict";
-const LOADING_PHASES = [
-  "Uploading image",
-  "Scanning visual features",
-  "Running neural network",
-  "Computing confidence",
-];
+const API_URL = "http://localhost:8000/predict";
 
 function sanitize(name) {
   return name.replace(/[^a-z0-9]/gi, "").toLowerCase();
@@ -55,10 +49,6 @@ function Hero() {
         <source src="../Animated/LNY_Sage-3_NightMarket.mp4" type="video/mp4" />
       </video>
       <div className="hero-overlay" />
-      <div className="particles">
-        <div className="particle" /><div className="particle" /><div className="particle" /><div className="particle" />
-        <div className="particle" /><div className="particle" /><div className="particle" /><div className="particle" />
-      </div>
       <div className="hero-content">
         <p className="hero-eyebrow">AI-Powered Identification</p>
         <h1 className="hero-title">
@@ -91,24 +81,6 @@ function Classifier() {
   const abortRef = useRef(null);
   const lastFileRef = useRef(null);
   const sectionRef = useRef(null);
-  const [progress, setProgress] = useState(0);
-  const [phase, setPhase] = useState(0);
-
-  useEffect(() => {
-    if (!loading) {
-      setProgress(0);
-      setPhase(0);
-      return;
-    }
-    const pt = setInterval(() => {
-      setProgress((p) => (p >= 92 ? p : Math.min(92, p + Math.random() * 6 + 1)));
-    }, 350);
-    const ph = setInterval(() => setPhase((p) => (p + 1) % LOADING_PHASES.length), 1300);
-    return () => {
-      clearInterval(pt);
-      clearInterval(ph);
-    };
-  }, [loading]);
 
   const classify = useCallback(async (file) => {
     if (abortRef.current) abortRef.current.abort();
@@ -233,23 +205,15 @@ function Classifier() {
           )}
 
           {preview && (
-            <div className={`preview-container ${loading ? "scanning" : ""}`}>
+            <div className="preview-container">
               <p className="preview-label">Uploaded Image</p>
-              <div className="preview-frame">
-                <img className="preview-image" src={preview} alt="Uploaded skin" />
-                {loading && <div className="scanline" />}
-              </div>
+              <img className="preview-image" src={preview} alt="Uploaded skin" />
             </div>
           )}
           {loading && (
             <div className="loading-container">
               <div className="loading-spinner" />
-              <p className="loading-text">Analyzing Skin</p>
-              <div className="loading-bar">
-                <div className="loading-bar-fill" style={{ width: `${progress}%` }} />
-              </div>
-              <p className="loading-percent">{Math.floor(progress)}%</p>
-              <p className="loading-phase">{LOADING_PHASES[phase]}</p>
+              <p className="loading-text">Analyzing Skin...</p>
             </div>
           )}
           {error && (
