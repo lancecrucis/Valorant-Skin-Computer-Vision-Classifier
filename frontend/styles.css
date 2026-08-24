@@ -229,6 +229,24 @@ body {
 .result-class.glitchpop { color: #e91e8c; }
 .result-class.nebula { color: #9c27b0; }
 .result-class.mystbloom { color: #f06292; }
+.result-class.ayakashi { color: #DC143C; }
+.result-class.divergence { color: #F5F5F0; }
+.result-class.gun { color: #40E0D0; }
+.result-class.gaiasvengeance { color: #FF6B6B; }
+.result-class.araxys { color: #A79373; }
+.result-class.preludetochoas { color: #C8A2FF; }
+.result-class.kuronami { color: #87CEEB; }
+.result-class.arcane { color: #FF00FF; }
+.result-class.spline { color: #003366; }
+.result-class.smite { color: #E0F0FF; }
+.result-class.ego { color: #FFD700; }
+.result-class.singularity { color: #FFFACD; }
+.result-class.sensation { color: #FF1493; }
+.result-class.blackthorn { color: #800000; }
+.result-class.neofrontier { color: #D2B48C; }
+.result-class.cyrax { color: #FFFFFF; }
+.result-class.cyrostasis { color: #A5F2F7; }
+.result-class.forsaken { color: #006400; }
 .confidence-row { margin-bottom: 20px; }
 .confidence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .confidence-name { font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); }
@@ -241,6 +259,24 @@ body {
 .confidence-name.glitchpop { color: #e91e8c; }
 .confidence-name.nebula { color: #9c27b0; }
 .confidence-name.mystbloom { color: #f06292; }
+.confidence-name.ayakashi { color: #DC143C; }
+.confidence-name.divergence { color: #F5F5F0; }
+.confidence-name.gun { color: #40E0D0; }
+.confidence-name.gaiasvengeance { color: #FF6B6B; }
+.confidence-name.araxys { color: #A79373; }
+.confidence-name.preludetochoas { color: #C8A2FF; }
+.confidence-name.kuronami { color: #87CEEB; }
+.confidence-name.arcane { color: #FF00FF; }
+.confidence-name.spline { color: #003366; }
+.confidence-name.smite { color: #E0F0FF; }
+.confidence-name.ego { color: #FFD700; }
+.confidence-name.singularity { color: #FFFACD; }
+.confidence-name.sensation { color: #FF1493; }
+.confidence-name.blackthorn { color: #800000; }
+.confidence-name.neofrontier { color: #D2B48C; }
+.confidence-name.cyrax { color: #FFFFFF; }
+.confidence-name.cyrostasis { color: #A5F2F7; }
+.confidence-name.forsaken { color: #006400; }
 .confidence-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .confidence-track { width: 100%; height: 6px; background: var(--bg-secondary); overflow: hidden; }
 .confidence-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -253,6 +289,24 @@ body {
 .confidence-fill.glitchpop { background: linear-gradient(90deg, #c2185b, #e91e8c); }
 .confidence-fill.nebula { background: linear-gradient(90deg, #7b1fa2, #9c27b0); }
 .confidence-fill.mystbloom { background: linear-gradient(90deg, #c4367a, #f06292); }
+.confidence-fill.ayakashi { background: linear-gradient(90deg, #b01030, #DC143C); }
+.confidence-fill.divergence { background: linear-gradient(90deg, #e0e0d8, #F5F5F0); }
+.confidence-fill.gun { background: linear-gradient(90deg, #20b0a0, #40E0D0); }
+.confidence-fill.gaiasvengeance { background: linear-gradient(90deg, #e04040, #FF6B6B); }
+.confidence-fill.araxys { background: linear-gradient(90deg, #8a7a60, #A79373); }
+.confidence-fill.preludetochoas { background: linear-gradient(90deg, #9060e0, #C8A2FF); }
+.confidence-fill.kuronami { background: linear-gradient(90deg, #50a0d0, #87CEEB); }
+.confidence-fill.arcane { background: linear-gradient(90deg, #c000c0, #FF00FF); }
+.confidence-fill.spline { background: linear-gradient(90deg, #001a33, #003366); }
+.confidence-fill.smite { background: linear-gradient(90deg, #b0d0f0, #E0F0FF); }
+.confidence-fill.ego { background: linear-gradient(90deg, #c0a000, #FFD700); }
+.confidence-fill.singularity { background: linear-gradient(90deg, #e0d8a0, #FFFACD); }
+.confidence-fill.sensation { background: linear-gradient(90deg, #c01060, #FF1493); }
+.confidence-fill.blackthorn { background: linear-gradient(90deg, #500000, #800000); }
+.confidence-fill.neofrontier { background: linear-gradient(90deg, #b09070, #D2B48C); }
+.confidence-fill.cyrax { background: linear-gradient(90deg, #d0d0d0, #FFFFFF); }
+.confidence-fill.cyrostasis { background: linear-gradient(90deg, #70c0d0, #A5F2F7); }
+.confidence-fill.forsaken { background: linear-gradient(90deg, #004000, #006400); }
 .loading-container { margin-top: 32px; text-align: center; padding: 32px; }
 .loading-spinner {
   width: 40px; height: 40px; border: 3px solid var(--border-color);

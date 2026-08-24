@@ -3,6 +3,10 @@ const { useState, useRef, useEffect, useCallback } = React;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const API_URL = "http://localhost:8000/predict";
 
+function sanitize(name) {
+  return name.replace(/[^a-z0-9]/gi, "").toLowerCase();
+}
+
 /* ===== NAVBAR ===== */
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -218,11 +222,11 @@ function Classifier() {
           )}
           {result && (
             <div className="result-container">
-              <div className="result-header"><span className="result-label">Prediction</span><span className={`result-class ${result.predicted}`}>{result.predicted}</span></div>
+              <div className="result-header"><span className="result-label">Prediction</span><span className={`result-class ${sanitize(result.predicted)}`}>{result.predicted}</span></div>
               {Object.entries(result.scores).sort((a, b) => b[1] - a[1]).map(([name, score]) => (
                 <div className="confidence-row" key={name}>
-                  <div className="confidence-header"><span className={`confidence-name ${name}`}>{name}</span><span className="confidence-value">{pct(score)}%</span></div>
-                  <div className="confidence-track"><div className={`confidence-fill ${name}`} style={{ width: `${pct(score)}%` }} /></div>
+                  <div className="confidence-header"><span className={`confidence-name ${sanitize(name)}`}>{name}</span><span className="confidence-value">{pct(score)}%</span></div>
+                  <div className="confidence-track"><div className={`confidence-fill ${sanitize(name)}`} style={{ width: `${pct(score)}%` }} /></div>
                 </div>
               ))}
               <div className="result-actions">
