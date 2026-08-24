@@ -1,7 +1,7 @@
 const { useState, useRef, useEffect, useCallback } = React;
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const API_URL = "http://localhost:8000/predict";
+const API_URL = "/predict";
 
 function sanitize(name) {
   return name.replace(/[^a-z0-9]/gi, "").toLowerCase();

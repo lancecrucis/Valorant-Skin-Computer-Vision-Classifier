@@ -7,6 +7,7 @@ from pathlib import Path
 import torch
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from PIL import Image
 
 from src.dataset import WEAPONS
@@ -117,6 +118,8 @@ async def predict(request: Request, file: UploadFile = File(...)):
     except Exception:
         raise HTTPException(status_code=500, detail="Prediction failed. Check server logs.")
 
+
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
 if __name__ == "__main__":
     import uvicorn
