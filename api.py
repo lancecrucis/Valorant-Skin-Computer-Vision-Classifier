@@ -119,6 +119,8 @@ async def predict(request: Request, file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail="Prediction failed. Check server logs.")
 
 
+app.mount("/Animated", StaticFiles(directory="Animated"), name="animated")
+app.mount("/web_img", StaticFiles(directory="web_img"), name="web_images")
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
 if __name__ == "__main__":
