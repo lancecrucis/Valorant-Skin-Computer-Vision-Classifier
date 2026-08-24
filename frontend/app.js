@@ -2,6 +2,12 @@ const { useState, useRef, useEffect, useCallback } = React;
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const API_URL = "/predict";
+const LOADING_PHASES = [
+  "Uploading image",
+  "Scanning visual features",
+  "Running neural network",
+  "Computing confidence",
+];
 
 function sanitize(name) {
   return name.replace(/[^a-z0-9]/gi, "").toLowerCase();
@@ -84,6 +90,25 @@ function Classifier() {
   const inputRef = useRef(null);
   const abortRef = useRef(null);
   const lastFileRef = useRef(null);
+  const sectionRef = useRef(null);
+  const [progress, setProgress] = useState(0);
+  const [phase, setPhase] = useState(0);
+
+  useEffect(() => {
+    if (!loading) {
+      setProgress(0);
+      setPhase(0);
+      return;
+    }
+    const pt = setInterval(() => {
+      setProgress((p) => (p >= 92 ? p : Math.min(92, p + Math.random() * 6 + 1)));
+    }, 350);
+    const ph = setInterval(() => setPhase((p) => (p + 1) % LOADING_PHASES.length), 1300);
+    return () => {
+      clearInterval(pt);
+      clearInterval(ph);
+    };
+  }, [loading]);
 
   const classify = useCallback(async (file) => {
     if (abortRef.current) abortRef.current.abort();
@@ -109,7 +134,7 @@ function Classifier() {
       }
     } catch (err) {
       if (err.name !== "AbortError") {
-        setError("Could not reach the API. Make sure api.py is running on port 8000.");
+        setError("Could not reach the API. Check your connection and try again.");
       }
     } finally {
       if (!controller.signal.aborted) setLoading(false);
@@ -155,12 +180,13 @@ function Classifier() {
     setError(null);
     setLoading(false);
     lastFileRef.current = null;
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [preview]);
 
   const pct = (v) => (v * 100).toFixed(1);
 
   return (
-    <section className="classifier-section" id="classifier">
+    <section ref={sectionRef} className="classifier-section" id="classifier">
       <div className="classifier-layout">
         <div className="classifier-info">
           <p className="section-eyebrow">Skin Classifier</p>
@@ -206,8 +232,26 @@ function Classifier() {
             </div>
           )}
 
-          {preview && <div className="preview-container"><p className="preview-label">Uploaded Image</p><img className="preview-image" src={preview} alt="Uploaded skin" /></div>}
-          {loading && <div className="loading-container"><div className="loading-spinner" /><p className="loading-text">Analyzing Skin...</p></div>}
+          {preview && (
+            <div className={`preview-container ${loading ? "scanning" : ""}`}>
+              <p className="preview-label">Uploaded Image</p>
+              <div className="preview-frame">
+                <img className="preview-image" src={preview} alt="Uploaded skin" />
+                {loading && <div className="scanline" />}
+              </div>
+            </div>
+          )}
+          {loading && (
+            <div className="loading-container">
+              <div className="loading-spinner" />
+              <p className="loading-text">Analyzing Skin</p>
+              <div className="loading-bar">
+                <div className="loading-bar-fill" style={{ width: `${progress}%` }} />
+              </div>
+              <p className="loading-percent">{Math.floor(progress)}%</p>
+              <p className="loading-phase">{LOADING_PHASES[phase]}</p>
+            </div>
+          )}
           {error && (
             <div className="error-container">
               <div className="error-icon"><svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>

@@ -210,9 +210,19 @@ body {
 .dropzone-subtitle span { color: var(--accent-red); font-weight: 500; }
 
 /* ===== PREVIEW / RESULT / LOADING / ERROR ===== */
+.classifier-section { scroll-margin-top: 96px; }
 .preview-container { margin-top: 32px; text-align: center; }
+.preview-frame { position: relative; display: inline-block; max-width: 100%; }
 .preview-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
-.preview-image { max-width: 100%; max-height: 360px; border: 1px solid var(--border-color); object-fit: contain; background: var(--bg-secondary); }
+.preview-image { max-width: 100%; max-height: 360px; border: 1px solid var(--border-color); object-fit: contain; background: var(--bg-secondary); display: block; }
+.preview-container.scanning .preview-frame { overflow: hidden; }
+.scanline {
+  position: absolute; left: 0; right: 0; top: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, #36f3bf, transparent);
+  box-shadow: 0 0 14px rgba(54, 243, 191, 0.9);
+  animation: scanSweep 1.8s ease-in-out infinite alternate;
+}
+@keyframes scanSweep { from { top: 0; } to { top: calc(100% - 3px); } }
 .result-container { margin-top: 32px; }
 .result-header {
   display: flex; justify-content: space-between; align-items: center;
@@ -315,6 +325,26 @@ body {
 }
 .loading-text { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); }
 @keyframes spin { to { transform: rotate(360deg); } }
+.loading-bar {
+  width: min(320px, 80%); height: 6px; margin: 20px auto 10px;
+  background: var(--bg-secondary); border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+.loading-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--accent-red), #ff8a93);
+  transition: width 0.35s ease;
+}
+.loading-percent {
+  font-size: 12px; letter-spacing: 2px; color: var(--text-secondary);
+  font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.loading-phase {
+  font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--text-muted); margin-top: 8px; min-height: 16px;
+}
+.loading-phase::after { content: ""; display: inline-block; width: 16px; text-align: left; animation: dots 1.3s steps(1) infinite; }
+@keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
 .error-container {
   margin-top: 32px; padding: 20px 24px; background: rgba(255,70,85,0.08);
   border: 1px solid rgba(255,70,85,0.3); display: flex; align-items: center; gap: 12px;
