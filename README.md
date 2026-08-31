@@ -2,9 +2,12 @@
 
 AI-powered Valorant weapon skin bundle classifier with a web interface. Upload any weapon skin screenshot and the model identifies which bundle it belongs to.
 
-## Skin Bundles (9)
+## Skin Bundles (27)
 
-reaver, prime, mystbloom, elderflame, glitchpop, nebula, oni, prism, sovereign
+reaver, prime, mystbloom, elderflame, glitchpop, nebula, oni, prism, sovereign,
+araxys, arcane, spline, smite, ego, g.u.n, singularity, sensation, kuronami,
+blackthorn, ayakashi, divergence, prelude to chaos, gaia's vengeance,
+neo frontier, cyrax, cyrostasis, forsaken
 
 ## Tech Stack
 

@@ -1,7 +1,5 @@
 {
-  "best_epoch": 3,
-  "best_val_acc": 0.9887,
-  "num_classes": 9,
+  "num_classes": 27,
   "weapons": [
     "reaver",
     "prime",
@@ -11,7 +9,25 @@
     "nebula",
     "oni",
     "prism",
-    "sovereign"
+    "sovereign",
+    "araxys",
+    "arcane",
+    "spline",
+    "smite",
+    "ego",
+    "g.u.n",
+    "singularity",
+    "sensation",
+    "kuronami",
+    "blackthorn",
+    "ayakashi",
+    "divergence",
+    "prelude to chaos",
+    "gaia's vengeance",
+    "neo frontier",
+    "cyrax",
+    "cyrostasis",
+    "forsaken"
   ],
   "image_size": 224,
   "model": "efficientnet_b0"

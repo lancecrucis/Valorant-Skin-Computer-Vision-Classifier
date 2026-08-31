@@ -165,7 +165,7 @@ function Classifier() {
           <h2 className="section-title">Identify Your Gun Skin</h2>
           <div className="section-divider" />
           <p className="classifier-desc">
-            Our EfficientNet-B0 model has been trained on thousands of weapon skin images to accurately classify Reaver and Prime collections with high confidence.
+            Our EfficientNet-B0 model has been trained on thousands of weapon skin images to classify 27 supported VALORANT skin collections.
           </p>
           <div className="classifier-steps">
             <div className="step"><div className="step-number">01</div><div className="step-text"><h4>Upload Image</h4><p>Drag and drop or click to upload any weapon skin screenshot</p></div></div>
@@ -283,7 +283,7 @@ function Announcements() {
     <section className="announce-section" id="announcements">
       <div className="section-header" style={{ textAlign: 'center' }}>
         <p className="section-eyebrow">Version</p>
-        <h2 className="section-title">v1.1.0</h2>
+        <h2 className="section-title">v1.4.0</h2>
         <div className="section-divider" />
       </div>
       <div className="announce-showcase">
@@ -296,15 +296,15 @@ function Announcements() {
         <div className="announce-content">
           <div className="announce-badge">
             <div className="announce-badge-dot" />
-            <span>Latest Release</span>
+            <span>Current Model</span>
           </div>
-          <h3 className="announce-version-title">What's New</h3>
+          <h3 className="announce-version-title">Supported Bundles</h3>
           <ul className="announce-list">
             <li>
               <span className="announce-list-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
               </span>
-              <span>Added 7 new bundles (Mystbloom, Elderflame, Glitchpop, Nebula, Oni, Prism, Sovereign)</span>
+              <span>Expanded classification support from 9 to 27 skin bundles</span>
             </li>
             <li>
               <span className="announce-list-icon">
