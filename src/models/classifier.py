@@ -1,7 +1,9 @@
 from torch import nn
 from torchvision import models
 
-NUM_CLASSES =27
+from src.classes import WEAPONS
+
+NUM_CLASSES = len(WEAPONS)
 
 
 def get_model(num_classes: int = NUM_CLASSES, pretrained: bool = True) -> nn.Module:

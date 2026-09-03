@@ -11,7 +11,7 @@ import numpy as np
 import torch
 from sklearn.metrics import classification_report, confusion_matrix
 from torch import nn
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader
 
 from src.dataset import WEAPONS, ValorantSkinDataset
 from src.models.classifier import get_model
@@ -20,6 +20,7 @@ from src.utils.transforms import train_transform, val_transform
 DATA_DIR = Path("data")
 CHECKPOINT_DIR = Path("checkpoints")
 OUTPUT_DIR = Path("outputs")
+SPLIT_MANIFEST = Path("splits/split_manifest.csv")
 BATCH_SIZE = 32
 EPOCHS = 25
 LR = 1e-3
@@ -139,23 +140,36 @@ def train() -> None:
     CHECKPOINT_DIR.mkdir(exist_ok=True)
     OUTPUT_DIR.mkdir(exist_ok=True)
 
-    full_dataset = ValorantSkinDataset(DATA_DIR, transform=train_transform)
-    if len(full_dataset) == 0:
+    if not SPLIT_MANIFEST.exists():
+        print("Split manifest not found. Run: uv run python split_dataset.py")
+        return
+
+    train_set = ValorantSkinDataset(
+        DATA_DIR, transform=train_transform, manifest=SPLIT_MANIFEST, split="train"
+    )
+    val_set = ValorantSkinDataset(
+        DATA_DIR, transform=val_transform, manifest=SPLIT_MANIFEST, split="val"
+    )
+    test_set = ValorantSkinDataset(
+        DATA_DIR, transform=val_transform, manifest=SPLIT_MANIFEST, split="test"
+    )
+    if not train_set or not val_set or not test_set:
         print("No images found in data/. Add images to data/<weapon>/ folders first.")
         return
 
-    print(f"Dataset: {len(full_dataset)} images across {len(WEAPONS)} classes")
-
-    val_size = max(1, int(0.2 * len(full_dataset)))
-    train_size = len(full_dataset) - val_size
-    train_set, val_set = random_split(full_dataset, [train_size, val_size])
-    val_set.dataset = ValorantSkinDataset(DATA_DIR, transform=val_transform)
+    print(
+        f"Dataset: train={len(train_set)}, val={len(val_set)}, "
+        f"test={len(test_set)} across {len(WEAPONS)} classes"
+    )
 
     train_loader = DataLoader(
         train_set, batch_size=BATCH_SIZE, shuffle=True, num_workers=0
     )
     val_loader = DataLoader(
         val_set, batch_size=BATCH_SIZE, shuffle=False, num_workers=0
+    )
+    test_loader = DataLoader(
+        test_set, batch_size=BATCH_SIZE, shuffle=False, num_workers=0
     )
 
     model = get_model(pretrained=True).to(DEVICE)
@@ -221,18 +235,27 @@ def train() -> None:
             CHECKPOINT_DIR / "best_model.pth", map_location=DEVICE, weights_only=True
         )
     )
-    _, _final_acc, final_preds, final_labels = evaluate(model, val_loader, criterion)
+    _, final_acc, final_preds, final_labels = evaluate(model, test_loader, criterion)
 
     plot_training_curves(history, OUTPUT_DIR / "training_curves.png")
     plot_confusion_matrix(
         final_labels, final_preds, OUTPUT_DIR / "confusion_matrix.png"
     )
 
-    report = classification_report(final_labels, final_preds, target_names=WEAPONS)
-    (OUTPUT_DIR / "classification_report.txt").write_text(report)
+    report = classification_report(
+        final_labels,
+        final_preds,
+        labels=list(range(len(WEAPONS))),
+        target_names=WEAPONS,
+        zero_division=0,
+    )
+    (OUTPUT_DIR / "test_classification_report.txt").write_text(report)
     print(f"\n{report}")
 
-    print(f"Training complete. Best val accuracy: {best_acc:.3f}")
+    print(
+        f"Training complete. Best val accuracy: {best_acc:.3f}; "
+        f"untouched test accuracy: {final_acc:.3f}"
+    )
     print(f"Outputs saved to {OUTPUT_DIR}/")
 
 

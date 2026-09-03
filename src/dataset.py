@@ -1,12 +1,12 @@
+import csv
 from pathlib import Path
 
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 
-WEAPONS = ["reaver", "prime", "mystbloom", "elderflame", "glitchpop", "nebula", "oni", "prism", "sovereign","araxys","arcane","spline",
-           "smite","ego", "g.u.n","singularity","sensation","kuronami","blackthorn","ayakashi","divergence","prelude to chaos","gaia's vengeance",
-           "neo frontier","cyrax","cyrostasis","forsaken"]
+from src.classes import WEAPONS
+
 WEAPON_TO_IDX = {w: i for i, w in enumerate(WEAPONS)}
 
 
@@ -17,10 +17,27 @@ class ValorantSkinDataset(Dataset):
         self,
         root: str | Path,
         transform: transforms.Compose | None = None,
+        manifest: str | Path | None = None,
+        split: str | None = None,
     ) -> None:
         self.root = Path(root)
         self.transform = transform
         self.samples: list[tuple[Path, int]] = []
+
+        if manifest is not None:
+            if split not in {"train", "val", "test"}:
+                raise ValueError("split must be 'train', 'val', or 'test' with a manifest")
+            with Path(manifest).open(newline="", encoding="utf-8") as handle:
+                for row in csv.DictReader(handle):
+                    if row["split"] != split:
+                        continue
+                    class_name = row["class_name"]
+                    if class_name not in WEAPON_TO_IDX:
+                        raise ValueError(f"Unknown manifest class: {class_name}")
+                    self.samples.append(
+                        (self.root / Path(row["path"]), WEAPON_TO_IDX[class_name])
+                    )
+            return
 
         for weapon in WEAPONS:
             weapon_dir = self.root / weapon

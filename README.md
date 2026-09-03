@@ -34,8 +34,13 @@ Then open `frontend/index.html` in your browser (or serve it with any static fil
 ## Training
 
 ```bash
+uv run python split_dataset.py
 uv run python train.py
 ```
+
+The split manifest keeps numbered image sequences together so related frames cannot
+appear in both training and evaluation. Training uses validation for model selection
+and reports final metrics on the separate test split.
 
 Checkpoints saved to `checkpoints/best_model.pth`.
 
